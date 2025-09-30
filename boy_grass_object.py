@@ -1,9 +1,6 @@
 from pico2d import *
 import random
 
-
-# Game object class here
-
 class Grass:
     def __init__(self):
         self.image = load_image('grass.png')
@@ -18,7 +15,7 @@ class Grass:
 class Boy:
     def __init__(self):
         self.x, self.y = random.randint(0, 800), 90
-        self.frame = 0
+        self.frame = random.randint(0,7)
         self.image = load_image('run_animation.png')
 
     def update(self):
@@ -28,6 +25,21 @@ class Boy:
     def draw(self):
         self.image.clip_draw(self.frame * 100, 0, 100, 100, self.x, self.y)
 
+class Zombie:
+    def __init__(self):
+        self.x, self.y = 100, 170
+        self.frame = 0
+        self.image = load_image('zombie_run_animation.png')
+
+    def update(self):
+        self.frame = (self.frame + 1) % 10
+        self.x += 5
+
+    def draw(self):
+        frame_width = self.image.w // 10
+        frame_height = self.image.h
+        self.image.clip_draw(self.frame * frame_width, 0, frame_width, frame_height,
+                             self.x, self.y, frame_width // 2, frame_height // 2)
 
 def handle_events():
     global running
@@ -41,40 +53,40 @@ def handle_events():
 
 def reset_world():
     global running
-    global grass
-    global team
     global world
 
     running = True
     world = []
 
     grass = Grass()
+    zombie = Zombie()
     world.append(grass)
+    world.append(zombie)
 
     team = [Boy() for i in range(10)]
     world += team
 
 
 def update_world():
-    for o in world:
-        o.update()
+    for game_object in world:
+        game_object.update()
     pass
 
 
 def render_world():
     clear_canvas()
-    for o in world:
-        o.draw()
+    for game_object in world:
+        game_object.draw()
     update_canvas()
 
 
 open_canvas()
 reset_world()
-# game loop
+
 while running:
     handle_events()
     update_world()
     render_world()
     delay(0.05)
-# finalization code
+
 close_canvas()
